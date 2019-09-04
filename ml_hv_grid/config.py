@@ -8,6 +8,18 @@ import os
 from os import path as op
 #from hyperopt import hp
 
+### Confirguration added by Ryan for Enian cluster ###
+base_path = os.path.dirname(os.path.realpath(__file__))
+
+BUILDS_PATH = os.path.join(base_path, 'BUILDS')
+if not op.isdir(BUILDS_PATH):
+    os.mkdir(BUILDS_PATH)
+os.environ['BUILDS_DIR'] = BUILDS_PATH
+
+MAPBOX_TOKEN = 'pk.eyJ1IjoicnlhbmVuaWFuIiwiYSI6ImNqeG9reW0wbzA3ZmwzaHA3ZGRlNGJhY3UifQ.IkI_4dMSNOWgdm7d1ReS6A'
+os.environ['VIVID_ACCESS_TOKEN'] = MAPBOX_TOKEN
+########################################################
+
 # Set filepaths pointing to data that will be used in training
 data_fnames = [op.join('data_nigeria', 'data5.npz'),
                op.join('data_pakistan', 'data5.npz'),
@@ -63,26 +75,36 @@ train_params = dict(n_rand_hp_iters=3,
                     shuffle_seed=42)  # Seed for random number generator
 
 
-download_params = dict(aws_bucket_name='ds-ml-labs',
-                       aws_dir='datasets/hv_pred_set/pakistan',
-                       aws_region='us-east-1',
-                       tile_ind_list=op.join(preds_dir, 'tile_inds_Pakistan_18.txt'),
+download_params = dict(storage_dir=op.join(os.environ['BUILDS_DIR'], 'ml-hv-grid', 'country-tile-storage', 'India'),
+                       tile_ind_list=op.join(preds_dir, 'tile_inds_India_18.txt'),
                        tile_ind_list_format=['cover', 'tabbed', 'spaced'][2],  # cover.js or tab/space separated
                        n_green_threads=500,
                        download_prob=0.05,  # 0.1 downloads 10%, 0.9 downloads 90%
-                       url_template='https://api.mapbox.com/v4/digitalglobe.2lnpeioh/{z}/{x}/{y}.png?access_token={token}'.format(
+                       token=os.environ['VIVID_ACCESS_TOKEN'],
+                       url_template='https://api.mapbox.com/v4/digitalglobe.2lnpeioh/{z}/{x}/{y}.jpg?access_token={token}'.format(
                            x='{x}', y='{y}', z='{z}', token=os.environ['VIVID_ACCESS_TOKEN']))
 
-gen_tile_inds_params = dict(geojson_bounds=op.join(preds_dir, 'all_country_bounds.geojson'),
+### Revert to the below commented out code to use AWS instead of local storage ###
+# download_params = dict(aws_bucket_name='ds-ml-labs',
+#                        aws_dir='datasets/hv_pred_set/pakistan',
+#                        aws_region='us-east-1',
+#                        tile_ind_list=op.join(preds_dir, 'tile_inds_Pakistan_18.txt'),
+#                        tile_ind_list_format=['cover', 'tabbed', 'spaced'][2],  # cover.js or tab/space separated
+#                        n_green_threads=500,
+#                        download_prob=0.05,  # 0.1 downloads 10%, 0.9 downloads 90%
+#                        url_template='https://api.mapbox.com/v4/digitalglobe.2lnpeioh/{z}/{x}/{y}.png?access_token={token}'.format(
+#                            x='{x}', y='{y}', z='{z}', token=os.environ['VIVID_ACCESS_TOKEN']))
+
+gen_tile_inds_params = dict(geojson_bounds=op.join(preds_dir, 'INDIA.geojson'),
                             geojson_pakistan_bounds=op.join(preds_dir, 'pakistan_WB.geojson'),  # Seperate bounding box for Pakistan
-                            country='Pakistan',
+                            country='India',
                             max_zoom=18)
 
 pred_params = dict(aws_bucket_name='ds-ml-labs',
                    #aws_country_dir='datasets/hv_pred_set/Zambia',  # File dir for images
-                   pred_fname='preds_zambia_147.json',  # File name for predictions
+                   pred_fname='Vatican_City.json',  # File name for predictions
                    aws_pred_dir='datasets/hv_pred_set/',  # File dir for prediction values
-                   local_img_dir=op.join(preds_dir, 'zambia_147'),
+                   local_img_dir=op.join(preds_dir, 'Vatican_City'),
                    model_time='0129_052307',
                    single_batch_size=16,  # Number of images seen by a single GPU
                    n_gpus=1,

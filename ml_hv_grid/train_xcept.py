@@ -283,3 +283,4 @@ if __name__ == '__main__':
 
     with open(op.join(ckpt_dir, 'trials_{}.pkl'.format(start_time)), "wb") as pkl_file:
         pickle.dump(trials, pkl_file)
+sup

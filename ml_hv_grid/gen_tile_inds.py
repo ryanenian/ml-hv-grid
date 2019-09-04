@@ -9,7 +9,7 @@ import os.path as op
 from queue import LifoQueue
 from datetime import datetime as dt
 from decimal import Decimal
-
+import mercantile
 import json
 from shapely.geometry import shape, Polygon
 from pygeotile.tile import Tile
@@ -100,7 +100,7 @@ if __name__ == "__main__":
             geojson = json.loads(geojson_f.read())
             print('Country bounds loaded from: {}'.format(tile_p['geojson_bounds']))
             for fi, feature in enumerate(geojson['features']):
-                if feature['properties']['SOVEREIGNT'] == tile_p['country']:
+                if feature['properties']['NAME_0'] == tile_p['country']:
                     bound = feature['geometry']
                     break
     print('Computing tiles at zoom {} for {}'.format(
@@ -132,6 +132,7 @@ if __name__ == "__main__":
             top_tile, comp_contained = stack.get()
 
             # Check if desired zoom has been reached
+
             if top_tile.zoom >= tile_p['max_zoom']:
                 print('{} {} {}'.format(top_tile.google[0], top_tile.google[1],
                                         top_tile.zoom), file=tile_list_f)

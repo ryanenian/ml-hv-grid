@@ -12,12 +12,12 @@ from datetime import datetime as dt
 import numpy as np
 import json
 import tensorflow as tf
-import boto3
-from botocore.exceptions import ClientError
+#import boto3
+#from botocore.exceptions import ClientError
 import numpy as np
-import keras.backend as K
-from keras.utils import multi_gpu_model
-from keras.applications.xception import preprocess_input as xcept_preproc
+import tensorflow.keras.backend as K
+from tensorflow.keras.utils import multi_gpu_model
+from tensorflow.keras.applications.xception import preprocess_input as xcept_preproc
 from PIL import Image
 import yaml
 
@@ -26,35 +26,35 @@ from config import ckpt_dir, preds_dir, pred_params as pred_p
 
 
 def load_preds(loc_pred_fpath, bucket, s3_pred_fpath):
-    s3 = boto3.resource('s3')
+    #s3 = boto3.resource('s3')
 
     loaded_preds = dict()
     # Try to download predictions json file and load into memory
     try:
-        s3.Object(bucket, s3_pred_fpath).download_file(loc_pred_fpath)
+        #s3.Object(bucket, s3_pred_fpath).download_file(loc_pred_fpath)
 
         with open(loc_pred_fpath, 'r') as existing_pred_f:
             loaded_preds = json.load(existing_pred_f)
         print('Found existing predictions on S3')
 
     # If error, make sure the error was that the file doesn't exist
-    except ClientError as e:
-        if int(e.response['Error']['Code']) != 404:  # Key exist, some other error
-            raise e
+    except:
+        # if int(e.response['Error']['Code']) != 404:  # Key exist, some other error
+        #     raise e
         print('No predictions found on S3')
 
     return loaded_preds
 
 def save_preds(existing_preds, new_pred_dict, loc_pred_fpath, bucket, s3_pred_fpath):
     """Update/save a set of predictions to S3 depending on if it exists (and locally)"""
-    s3 = boto3.resource('s3')
+    #s3 = boto3.resource('s3')
 
     # Update prediction dict and upload to S3
     existing_preds.update(new_pred_dict)
     with open(loc_pred_fpath, 'w') as new_pred_f:
         json.dump(existing_preds, new_pred_f)
 
-    s3.Object(bucket, s3_pred_fpath).upload_file(loc_pred_fpath)
+    #s3.Object(bucket, s3_pred_fpath).upload_file(loc_pred_fpath)
     print('Uploaded new predictions to S3')
 
 
@@ -150,7 +150,7 @@ for bi in range(n_batches - 1):
     '''
     preproc_st = dt.now()
     preproc_delta = preproc_st - load_st
-    print('{} images preproced in {}; {} per image'.format(
+    print('{} images preproced in {}; {} per image'.format(                              
         img_batch.shape[0], preproc_delta, preproc_delta / img_batch.shape[0]))
     '''
 

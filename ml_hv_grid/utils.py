@@ -10,7 +10,7 @@ import pprint
 
 import numpy as np
 import matplotlib as mpl
-from keras.models import model_from_yaml
+from tensorflow.keras.models import model_from_yaml
 from pygeotile.tile import Tile
 
 import config as cf
